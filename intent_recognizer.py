@@ -2,12 +2,11 @@ import tensorflow as tf
 from tensorflow.keras.preprocessing.text import Tokenizer
 from tensorflow.keras.preprocessing.sequence import pad_sequences
 import numpy as np
-import random
 import json
+import keras
  
 import warnings
 warnings.filterwarnings('ignore')
-
 
 
 with open('Intent Recognition/Intent.json', 'r') as f:
@@ -28,7 +27,6 @@ def clean(line):
             cleaned_line += ' '
     cleaned_line = ' '.join(cleaned_line.split())
     return cleaned_line
-
 
 
 #list of intents
@@ -85,7 +83,6 @@ index_to_intent = {index: intent for intent, index in intent_to_index.items()}
 index_to_intent
 
 
-
 categorical_vec = tf.keras.utils.to_categorical(categorical_target, 
                                                 num_classes=num_classes)
  
@@ -136,33 +133,4 @@ test_labels = np.array([unique_intents.index(intent) for intent in test_intents]
 test_labels = tf.keras.utils.to_categorical(test_labels, num_classes=num_classes)
 loss, accuracy = model.evaluate(test_padded_sequences, test_labels)
 
-
-
-def response(sentence):
-    sent_tokens = []
-    # Split the input sentence into words
-    words = sentence.split()
-    # Convert words to their corresponding word indices
-    for word in words:                                           
-        if word in tokenizer.word_index:
-            sent_tokens.append(tokenizer.word_index[word])
-        else:
-            # Handle unknown words
-            sent_tokens.append(tokenizer.word_index['<unk>'])
-    sent_tokens = tf.expand_dims(sent_tokens, 0)
-    #predict numerical category
-    pred = model(sent_tokens)    
-    #category to intent
-    pred_class = np.argmax(pred.numpy(), axis=1)                
-    # random response to that intent
-    return random.choice(
-        response_for_intent[index_to_intent[pred_class[0]]]), index_to_intent[pred_class[0]]
-
-print("Note: Enter 'quit' to break the loop.")   
-while True:                                                
-    query = input('You: ')
-    if query.lower() == 'quit':
-        break
-    bot_response, typ = response(query)
-    print('Geek: {} -- TYPE: {}'.format(bot_response, typ))
-    print()
+keras.models.save_model(model, "intentRecognizer.keras")
