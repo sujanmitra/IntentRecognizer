@@ -2,10 +2,15 @@ import tensorflow as tf
 import random
 from keras.models import load_model
 
-model = load_model('intentRecognizer.keras')
+from flask import Flask
+
+app = Flask(__name__)
+
+# TODO: Fix this
+model = load_model('myModel.keras')
 
 def response(sentence):
-    sent_tokens = []
+    sent_tokens = []    
     # Split the input sentence into words
     words = sentence.split()
     # Convert words to their corresponding word indices
@@ -24,11 +29,19 @@ def response(sentence):
     return random.choice(
         response_for_intent[index_to_intent[pred_class[0]]]), index_to_intent[pred_class[0]]
 
-print("Note: Enter 'quit' to break the loop.")   
-while True:                                                
-    query = input('You: ')
-    if query.lower() == 'quit':
-        break
-    bot_response, typ = response(query)
-    print('Geek: {} -- TYPE: {}'.format(bot_response, typ))
-    print()
+@app.route('/')
+def hello_world():
+    print("Note: Enter 'quit' to break the loop.")   
+    while True:                                                
+        query = input('You: ')
+        if query.lower() == 'quit':
+            break
+        bot_response, typ = response(query)
+        return ('Bot: {} -- TYPE: {}'.format(bot_response, typ))
+    
+# main driver function
+if __name__ == '__main__':
+ 
+    # run() method of Flask class runs the application 
+    # on the local development server.
+    app.run()

@@ -80,14 +80,11 @@ print('Number of Intents :',num_classes)
  
 # Convert intent_to_index to index_to_intent
 index_to_intent = {index: intent for intent, index in intent_to_index.items()}
-index_to_intent
-
 
 categorical_vec = tf.keras.utils.to_categorical(categorical_target, 
                                                 num_classes=num_classes)
  
 print('Shape of Ca',categorical_vec.shape)
-categorical_vec[:5]
 
 epochs=100
 embed_dim=300
@@ -95,8 +92,6 @@ lstm_num=50
 output_dim=categorical_vec.shape[1]
 input_dim=len(unique_intents)
 print("Input Dimension :{},\nOutput Dimension :{}".format(input_dim,output_dim))
-
-
 
 model = tf.keras.models.Sequential([
     tf.keras.layers.Embedding(len(tokenizer.word_index) + 1, embed_dim),
@@ -111,8 +106,6 @@ model.compile(optimizer=optimizer, loss='categorical_crossentropy', metrics=['ac
 model.summary()
 
 model.fit(padded_sequences, categorical_vec, epochs=epochs, verbose=0)
-
-
 
 test_text_inputs = ["Hello", 
                     "my name is adam", 
@@ -133,4 +126,4 @@ test_labels = np.array([unique_intents.index(intent) for intent in test_intents]
 test_labels = tf.keras.utils.to_categorical(test_labels, num_classes=num_classes)
 loss, accuracy = model.evaluate(test_padded_sequences, test_labels)
 
-keras.models.save_model(model, "intentRecognizer.keras")
+model.save("myModel.keras")
